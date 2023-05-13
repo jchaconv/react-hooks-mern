@@ -1,0 +1,75 @@
+
+Instalaciones necesarias:
+https://gist.github.com/Klerith/4a4abfd88a88b2d1f16efd95fea41362
+
+
+*********************************
+SECCION 2 : Introducción a React
+*********************************
+
+Se creó 01-intro-react
+
+Se agregó:
+https://gist.github.com/Klerith/b0111f52ba16451d095f38d4c995605b
+
+así de sencillo se tiene un app con react
+
+Babel permite que React use código de js y es compatible para todos los browsers
+
+Ir al engranaje de la consola y marcar "selected context only"
+
+undefined.length => es un error crítico, para evitarlo:
+resApi.personajes?.length
+
+**********************************************
+SECCION 3 : Introducción a Javascript Moderno
+**********************************************
+
+
+
+
+
+
+
+***********************************
+SECCION 4 : Primeros pasos en React
+***********************************
+
+Posicionar la consola en la ruta donde estará el proyecto y ejecutar el comando:
+
+yarn create vite
+
+Entrar a 03-counter-app:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
