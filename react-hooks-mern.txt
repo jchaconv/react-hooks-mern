@@ -157,38 +157,94 @@ const mensaje = ( activo ) && 'Activo';
 SECCION 4 : Primeros pasos en React
 ***********************************
 
-Posicionar la consola en la ruta donde estará el proyecto y ejecutar el comando:
-
+-cmd(interactivo) en /d/cursos-udemy/react-hooks-mern:
+npm install -g yarn
 yarn create vite
+name: counter-app
+seleccionar react -> js -> cambiar nombre a la carpeta
+entrar a la ruta de la carpeta y ejecutar: yarn install
 
-Entrar a 03-counter-app:
+regresar a la carpeta padre y ejecutar:
+npx create-react-app counter-app
 
+ver diferencias entre proyectos
 
+ejecutar: yarn dev
 
-
-
-
-
-
-
-
-
-
+rafc para crear componentes
 
 
+********
 
+Comunicación entre Props
 
+desde la pestaña Components de la consola de chrome puedo probar las props
+puse title: "Hola" y enter, se ve el cambio
 
+para poner props por defecto en caso llegue vacío:
+export const FirstApp = ({ title = 'Hola soy Julio', subtitle, code }) ...
 
+para enviar un número:
+    <FirstApp
+        title="Hola, soy Goku"
+        subtitle={123}
+        code={456}
+    />
 
+********
 
+PropTypes: FirstApp.jsx
 
+yarn add prop-types
 
+Sirven para especificar las props del componente y sus tipos de datos
 
+para enviar un boolean solo es necesario enviar el nombre del propType:
+<FirstApp title />
 
+Para definirlas se pone al final:
 
+FirstApp.propTypes = {
+    title: PropTypes.string.isRequired,
+    subtitle: PropTypes.number.isRequired,
+    code: PropTypes.number
+}
 
+********
 
+DefaultProps : FirstApp.jsx
+
+para enviar valores por defecto y son tomados antes que las propTypes
+
+FirstApp.defaultProps = {
+    title: 'No hay titulo',
+    subtitle: 'No hay subtitulo',
+    username: 'Julio Chacon',
+    code: 240588
+}
+
+********
+
+Hook - useState :: CounterApp.jsx
+
+const [counter, setCounter ] = useState(value);
+
+value viene del componente padre
+
+si queremos modificar ese valor hay que llamar a setCounter()
+
+setCounter( counter + 1 );
+
+también se puede escribir así:
+
+setCounter( (c) => c + 1 );
+
+Cada vez que hay un cambio en el estado el componente se vuelve a ejecutar,
+lo comprobamos poniendo un log al comienzo:
+console.log('RENDER');
+
+Programar ordenandamente es clave porque si hubiera una invocación a un api
+se estaría ejecutando una y otra vez
 
 
 
