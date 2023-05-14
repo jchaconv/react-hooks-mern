@@ -25,10 +25,132 @@ resApi.personajes?.length
 SECCION 3 : Introducción a Javascript Moderno
 **********************************************
 
+-Bash en /d/cursos-udemy/react-hooks-mern:
+npx create-react-app intro-javascript
+-renombrar a 02-intro-javascript y llevar a bash:
+npm start
+
+const => no cambian
+let => variable
+
+****
+
+template string:
+`` => en mi teclado sale con Alt Gr + tecla a la izq de enter y arriba de shift
+con backticks puedo llamar variables y funciones
+
+****
+
+Objetos literales:
+
+const persona = {
+    nombre: 'Julio',
+    apellido: 'Chacon',
+    edad: 101,
+    direccion: {
+        ciudad: 'Lima',
+        zip: 2002,
+        lat: 14.23332,
+        lng: 23.56211
+    }
+};
+
+si quiero hacer una copia del objeto debo usar el operador spread
+para no hacer solo una copia de la referencia en memoria:
+
+const persona2 = { ...persona };
 
 
+****
+
+Arreglos:
+
+También se usa spread:
+let arreglo2 = [...arreglo, 5]
+
+la función map crea un nuevo arreglo y ejecuta una función
+
+****
+
+Funciones:
+
+Poner los parentesis para retornar un objeto:
+const getUser = () => ({
+    uid: 'ABC256',
+    username: 'chearee'
+})
+
+****
+
+Desestructuración de obj y arr:
+
+para hacerlo con obj anidados:
+const { nombreClave, anios, latlng } = retornaPersona4( persona );
+const {lat, lng } = latlng;
+
+****
+
+Import, export y funciones comunes de arreglos
+
+https://gist.github.com/Klerith/4aeb99d31aedbc29ff4d54bbb77d2d7f
+
+abrir y cambiar de pestaña, escribir el nombre del obj y se importará autom
+
+https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 
 
+Cuando la export es default no necesita llaves:
+
+export const owners = ['DC', 'Marvel'];
+export default heroes;
+
+import heroes, {owners} from "./data/heroes";
+
+Otra manera de exportar:
+
+const owners = ['DC', 'Marvel'];
+
+export {
+    heroes as default,
+    owners
+}
+
+****
+
+Promesas
+
+al resolve() se le pueden enviar valores y luego se llama con then()
+de la misma manera pasa con reject() y catch()
+
+para que una función pueda tener el then() y catch() es necesario que retornen
+una promesa
+
+
+****
+
+Fetch API
+
+Se vieron promesas encadenadas
+y manejo de json retornado por un api
+
+****
+
+Async - Await
+
+Cuando se agrega async el retorno de la función se convierte en una Promesa
+por cada Promise como response se agrega un await
+poner todo dentro de un try-catch
+
+****
+
+Operador Ternario
+
+Dos maneras de usarlo, la última es para el if corto
+
+const activo = true;
+
+//const mensaje = ( activo ) ? 'Activo' : 'Inactivo';
+const mensaje = ( activo ) && 'Activo';
 
 
 ***********************************
