@@ -246,7 +246,83 @@ console.log('RENDER');
 Programar ordenandamente es clave porque si hubiera una invocación a un api
 se estaría ejecutando una y otra vez
 
+**************************************
+SECCION 6 : GifExpertApp - Aplicacion
+**************************************
 
+ir a carpeta principal:
+yarn create vite
+name: gif-expert-app
+
+entrar a la carpeta del proyecto:
+yarn install
+yarn dev
+
+estilos css:
+https://gist.github.com/Klerith/e4fca6ac127ccb9abd1e8ad77fcd52f1
+ponerlos de manera global importando en el main
+
+Cuando se hace un recorrido de arreglo se debe proporcionar un "key" prop unico
+categories.map( category => {
+    return <li key={ category }>{category}</li>
+})
+
+Se pone event.preventDefault(); en el onSubmit del form para evitar que recargue
+el navegador
+
+
+********
+
+Hooks - useEffect
+
+para evitar que react redibuje el componente una y otra vez
+se comento el Stricness para evitar un log de consola(solo afecta en desa no en prod)
+
+para evitar que se ejecute una y otra vez getGifs:
+
+este hook sirve para que cuando cambie el estado se ejecute un efecto secundario
+
+useEffect( () => {
+
+    getGifs(category);
+
+}, [])
+
+en el arreglo están las dependencias, así como está funcionó correctamente
+
+********
+
+customHook - useFetchGifs
+
+crearlo con rafc ya que es un componente pero no retorna jsx sino un objeto
+si las propiedas en el return tienen el mismo nombre(clave,valor) solo enviarlas así:
+return {
+    images,
+    isLoading
+}
+
+********
+
+Para mostrar jsx condicional:
+{
+    isLoading
+    ? ( <h2>Cargando ...</h2> )
+    : null
+}
+
+otra manera más corta:
+{
+    isLoading && ( <h2>Cargando ...</h2> )
+}
+
+
+********
+
+********
+
+********
+
+********
 
 
 
