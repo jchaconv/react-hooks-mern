@@ -316,14 +316,289 @@ otra manera más corta:
 }
 
 
-********
+******************************************
+SECCION 9 : Profundizando hooks generales
+******************************************
+
+
+yarn create vite
+name: hook-app
+renombrar a 05-hook-app
+yarn
+
+borrar todo excepto el main.jsx y crear un index.css
+
+
+se agregó bootstrap con esto en el index.html:
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 
 ********
 
-********
+useState :: CounterApp.jsx
+
+este hook también puede almacenar el estado de un objeto
+
+const [ state, setCounter] = useState({
+        counter1: 10,
+        counter2: 20,
+        counter3: 30
+});
+
+si quiero cambiar el estado de algún counter con el setCounter debo 
+especificar cada propiedad del objeto, para ello se recomienda usar spread
+
+onClick={ () => setCounter({
+    ...state,
+    counter1: counter1 + 1
+}) }
 
 ********
 
+customHook - useCounter.js
 
+puedo retornar valores y funciones para cambiar el estado:
+
+return {
+    counter,
+    increment,
+    decrement,
+    reset,
+}
+
+puedo consumir así :: CounterWithCustomHook.jsx
+
+const { counter, increment, decrement, reset } = useCounter();
+
+Si se necesita enviar algún valor a las funciones del customHook se debe hacer así:
+<button 
+    onClick={ () => increment(2) }
+>+1</button>
+
+haciendo esto también se evita el object Object
+
+********
+
+useEffect :: SimpleForm.jsx
+
+En esta función se recibe el event, al cual desestructuramos con {target}, asimismo
+se obtiene {name, value} del target 
+y está reconociendo el nombre del input que está cambiando y le setea el valor
+con [name]: value
+
+const onInputChange = ({ target }) => {
+    const { name, value } = target;
+    console.log(name, value);
+    setFormState({
+        ...formState,
+        [ name ]: value
+    });
+}
+
+en cuanto a las dependencias del hook, cuando solo se necesita que se ejecute la función
+al levantar el componente por primera vez, se deja el arreglo vacío, así:
+useEffect(() => {
+    console.log('useEffect!');
+}, []);
+
+Se recomienda tener useEffect por cada estado que cambie, por ejemplo:
+useEffect(() => {
+    console.log('useEffect!');
+}, []);
+
+useEffect(() => {
+    console.log('formState changed!');
+}, [formState]);
+
+useEffect(() => {
+    console.log('email changed!');
+}, [email]);
+
+
+********
+
+useEffect unmount - Cleanup :: Message.jsx
+
+para ver la opción del retorno del useEffect
+se usa cuando el componente se levanta y se destruye:
+
+useEffect(() => {
+
+    console.log('Message Mounted');
+
+    return () => {
+        console.log('Message Unmounted');
+    }
+}, [])
+
+Es necesario hacer la limpieza en el return como en el ejemplo:
+useEffect(() => {
+
+    const onMouseMove = ({ x, y }) => {
+        setCoords({ x, y});
+    }
+    
+    window.addEventListener( 'mousemove', onMouseMove);
+
+    return () => {
+        window.removeEventListener( 'mousemove', onMouseMove);
+    }
+}, [])
+
+********
+
+customHook - useForm.js
+
+Para hacer el componente genérico y poder invocar sus propiedades ahorrando una línea
+para la Desestructuración. Se puede hacer lo siguiente:
+
+Agregar ...formState y de esa manera estarán llegando todas las propiedades que tenga el formulario
+
+return {
+   ...formState,
+   formState,
+   onInputChange
+}
+
+En FormWithCustomHook.jsx:
+
+const { formState, onInputChange, username, email, password } = useForm({
+    username: '',
+    email: '',
+    password: ''
+});
+
+********
+
+archivo de barril para reducir imports
+se creó /hooks/index.js
+
+export * from './useCounter';
+export * from './useFetch';
+export * from './useForm';
+
+Las imports quedarían así:
+import { useCounter, useFetch } from '../hooks';
+
+
+********
+
+hooks :: useRef => FocusScreen.jsx
+
+Sirve para manipular un objeto en especifico utilizando su referencia
+y de esa manera no se dibuja el componente otra vez
+
+const inputRef = useRef();
+
+const onClick = () => {
+    inputRef.current.select();
+}
+
+
+********
+
+funcion memo :: Memorize.jsx
+
+Se ve que un componente hijo se crea otra vez cuando el padre tiene un cambio
+en otro componente hijo. En este ejemplo se vio lo sgte:
+
+<Memorize>
+    <Small />
+
+    <button {show}>
+
+</Memorize>
+
+Cuando había un cambio en el state show se disparaba también el Small
+Para solucionar esto podemos usar la funcion memo de react.
+
+Esta manera es poco usada pero sirve. Se debe englobar el código en paréntesis luego
+de la palabra memo.
+
+import { memo } from 'react';
+
+export const Small = memo(({ value }) => {
+
+    console.log('Small dibujando ...')
+
+    return (
+        <small>{ value }</small>
+    )
+})
+
+Esta forma es más usual:
+
+import React from 'react'
+
+export const Small = React.memo(({ value }) => {
+
+    console.log('Small dibujando ...')
+
+    return (
+        <small>{ value }</small>
+    )
+})
+
+Así ya no se dispara el componente Small :)
+
+********
+
+hook - useMemo :: MemoHook.jsx
+
+El hook guarda en memoria el valor de la función y solo se volverá a procesar
+cuando haya un cambio en el arreglo de dependencias, en este caso "counter"
+
+const memorizedValue = useMemo(() => heavyStuff(counter), [counter]);
+
+<h4> { memorizedValue } </h4>
+
+Al usar el hook ya no se muestra el log del heavyStuff
+
+********
+
+hook - useCallback :: CallbackHook.jsx
+
+Cuando se envía una función a otro componente este no la puede memorizar así tenga 
+React.memo porque cada vez que se crea apunta a un espacio de memoria distinto
+
+Una vez agrego el sgte codigo:
+
+const incrementFather = useCallback(
+    () => {
+        setCounter( (value) => value +1 );
+    },
+    [],
+);
+
+De esta manera queda memorizada incrementFather y ShowIncrement la puede reconocer como
+la misma funcion inicial
+
+Se usa así: setCounter( (value) => value +1 );
+porque al mandarle el callback está tomando el valor inicial de una manera más forsoza y lo suma
+
+Si se necesita mandar argumentos:
+
+const incrementFather = useCallback(
+    ( cinco ) => {
+        setCounter( (value) => value + cinco );
+    },
+    [],
+);
+
+
+En ShowIncrement:
+<button
+    className='btn btn-primary'
+    onClick={ () => {
+        increment(5);
+    }}
+>
+
+
+********
+
+
+
+
+********
 
 
