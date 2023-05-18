@@ -594,11 +594,106 @@ En ShowIncrement:
 >
 
 
+********************************************
+SECCION 10 : Profundizando hooks useReducer
+********************************************
+
+Reducer:
+es una funcion pura(sin efectos secundarios) y no puede ser async
+no debe llamar a localStorage o sessionStorage
+retorna un nuevo estado necesariamente
+usualmente recibe dos args(initialState, accion(no debe requerir más de una))
+
+Ejemplo:
+
+const initialTodos = [{
+    id: 1,
+    todo: 'comprar yogurt',
+    done: false
+}];
+
+const todoReducer = ( state = initialTodos, action) => {
+    return state;
+}
+
+let todos = todoReducer();
+console.log(todos); => esto retornaría el state inicial
+
+La idea es tener en un solo lugar todas las acciones que cambian el state del app
+
+intro-reducer.js
+
+En el reducer definir la accion como {} por default para evitar errores
+definir la accion y usar spread para retornar el state anterior más lo nuevo
+
+también se puede declarar así:
+
+export const todoReducer = ( initialState = [], action = {} ) => {
+}
+
+********
+
+hooks - useReducer :: TodoApp.jsx
+
+Para el caso de [TODO] Add Todo se está retornando el nuevo estado así:
+return [ ...initialState, action.payload ]
+el spread es para guardar lo que ya estaba y el
+action.payload debería ser lo que se va a añadir
+
+handleNewTodo => en esta función se crea un action {} y se envía al reducer
+mediante el dispatch. Y solo con eso ya se puede ver el todo agregado en la lista.
+
+
+TodoAdd.jsx
+Aquí se tiene la lógica de como emitir un valor desde un form | formulario
+
+********
+
+localStorage en la pestaña application del navegador
+para hacer persistente la info
+
+para que los datos se guarden incluso cuando se recargue el navegador necesitamos
+usar la tercera funcion del useReducer(todoReducer, initialState, init)
+
+En TodoApp.jsx se definió la funcion init que retorna los todos y si no existen da un []
+
+********
+
+borrar un todo
+se hizo la funcion handleDeleteTodo la cual viajó en onDeleteTodo
+desde TodoApp->TodoList->TodoItem
+
+marcar como completado || toggle :: TodoItem.jsx
+
+className={`align-self-center ${ (todo.done) ? 'text-decoration-line-through' : '' }`}
+
+********
+
+custom hook :: useTodos.js
+
+Se centralizó todo la lógica de TodoApp.jsx en el hook
+se retornaron funciones y valores "sin declarar arriba"
+
+return {
+    todos,
+    handleNewTodo,
+    handleToggleTodo,
+    handleDeleteTodo,
+    todosCount: todos.length,
+    pendingTodosCount: todos.filter( todo => !todo.done ).length
+}
+
 ********
 
 
 
 
 ********
+
+
+
+
+********
+
 
 
