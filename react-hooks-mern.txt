@@ -683,17 +683,140 @@ return {
     pendingTodosCount: todos.filter( todo => !todo.done ).length
 }
 
+
+
+********************************************
+SECCION 11 : Profundizando hooks useContext
+********************************************
+
+useContext: Para no pasar info de componentes "padres" a "nietos" o "bisnietos"
+    la idea es centralizar la info y buscarla en ese contexto para no tenerla tan
+    esparcida.
+    También hay casos donde los componentes no se encuentran dentro de otros, ahí
+    también es preciso usar el context(contenedor de info a nivel superior)
+
+Temas:
+*****
+
+- Context
+- Provider
+- useContext
+- React Router
+- Links y NavLinks
+- CreateContext
+- SPA ( Single Page Application )
+
+********
+
+react-router-dom => https://reactrouter.com/en/main
+
+yarn add react-router-dom@6
+
+Se agregó BrowserRouter en el main (high order component)
+
+import { BrowserRouter } from "react-router-dom";
+  
+  <BrowserRouter>
+    <MainApp />
+  </BrowserRouter>
+
+Cuando se solicita un path que no existe podemos redirigir directamente así
+usando el comodin:
+
+<Route path="/*" element={ <LoginPage /> } />
+
+El problema de hacerlo así es que redirecciona a LoginPage pero queda la url mal puesta,
+por eso es mejor usar Navigate:
+
+<Route path="/*" element={ <Navigate to="/about" />
+
+De esta manera también cambia la url incorrecta a /about
+
+********
+
+Link:
+
+Al usar esto:
+<a href="/about">About</a>
+Se hace un refresh de toda la página, mejor usar:
+<Link to="/login">Login</Link>
+de esa manera no recarga todo, solo lo necesario
+
+los estilos aplicados a los anchortags(<a>) son reflejados en
+Link porque en el dom es traducido como <a>
+
+********
+
+NavLink
+
+Ayuda en la navegación. A diferencia de Link se le puede poner clases
+
+Si se usa Navbar de bootstrap reducir el zoom del navegador para ver
+todos los links!
+
+El NavLink recibe args, el cual se desestructura para usar el campo isActive
+y de esa manera ponerle el active en el css del mismo NavLink
+
+********
+
+CreateContext y ContextProvider
+
+La idea es no hacer tanto traspaso de estados entre componentes y obtener data de un lugar
+que lo tenga todo centralizado.
+
+El Context(Higher Order Component) es el arbol de Componentes de la aplicación
+
+El CreateContext debe tener un valor inicial, puede ser cualquier cosa, incluso vacío => context/UserContext.jsx
+
+El ContextProvider se crea en otro archivo context/UserProvider y recibe children que son como los componentes hijos,
+también se le agrega .Provider y dentro tiene todo lo que los componentes pueden obtener de este context
+
+Para usarlo se debe ubicar el punto más alto de la aplicación donde se considere que los componentes hijos necesitarán la data,
+en nuestro ejemplo es el MainApp. Se reemplaza el fragment por el UserProvider
+
+Ir a Components en el browser y click en Context.Provider:
+Se ve que están los children y también los values que le pasamos
+
+Con datos en duro que luego fueron cambiados:
+
+UserProvider.jsx:
+
+import { UserContext } from "./UserContext"
+
+const user = {
+    id: 123,
+    name: 'Julio Chacon',
+    email: 'jchacon@email.com'
+}
+
+export const UserProvider = ({ children }) => {
+    return (
+        <UserContext.Provider value={{ user: user }}>
+            { children }
+        </UserContext.Provider>
+    )
+}
+
+********
+
+hooks: useContext
+
+Para usar los valores almacenados en el context. Ver LoginPage.jsx
+
+El llamado es muy simple:
+
+const { user } = useContext(UserContext);
+
+Como no lo quiero tener establecido por defecto en el Home, agrego esto '?':
+<h1>HomePage <small>{ user?.name }</small></h1>
+
+Se usó useState para modificar la info del usuario y que pueda tenerlo otro componente
+
 ********
 
 
 
-
 ********
 
-
-
-
 ********
-
-
 
