@@ -39,6 +39,8 @@ template string:
 `` => en mi teclado sale con Alt Gr + tecla a la izq de enter y arriba de shift
 con backticks puedo llamar variables y funciones
 
+alt+96 para backticks ``
+
 ****
 
 Objetos literales:
@@ -812,11 +814,291 @@ Como no lo quiero tener establecido por defecto en el Home, agrego esto '?':
 
 Se usó useState para modificar la info del usuario y que pueda tenerlo otro componente
 
+
+*************************************************
+SECCION 14 : HeroesApp - Single Page Application
+*************************************************
+
+navegar | navegacion | navegación | rutas | ruteo
+
+
+D:\cursos-udemy\react-hooks-mern> yarn create vite
+name: heroes-app-spa
+
+Cambiar nombre al directorio: 07-heroes-app-spa
+
+D:\cursos-udemy\react-hooks-mern> cd 07-heroes-app-spa
+D:\cursos-udemy\react-hooks-mern\07-heroes-app-spa> yarn install
+D:\cursos-udemy\react-hooks-mern\07-heroes-app-spa> yarn dev
+
+********
+
+crear primer router
+
+D:\cursos-udemy\react-hooks-mern\07-heroes-app-spa> yarn add react-router-dom@6
+
+Se agregó BrowserRouter en el main.jsx
+
+import { BrowserRouter } from "react-router-dom";
+  
+  <BrowserRouter>
+    <HeroesApp />
+  </BrowserRouter>
+
+Se creó router/AppRouter.jsx donde están las rutas del app
+
+********
+
+colocar clase de la ruta activa =>  /ui/components/Navbar.jsx
+
+Se pegó un gist para el Navbar.jsx
+Se agregó un index.js como archivo de barril, pero tener en cuenta que si se usa a ese nivel
+los componentes deben tener nombres distintos.
+
+Usar esta línea:
+
+<NavLink
+className={({ isActive }) => `nav-item nav-link ${isActive ? 'active' : ''}`} 
+to="/dc"
+></NavLink>
+
+Se crearon archivos de barril para tener exports e imports más ordenadas.
+Luego ctrl+shift+p => sort lines ascending seleccionando las líneas
+ordenar lineas | ascendente | alfabeticamente | alfabetico | alfabéticamente | alfabético
+orden alfabetico | orden alfabético | ordenar alfabeticamente | ordenar alfabéticamente
+
+Si solo pongo algo como esto:
+export * from './routes';
+Buscará el archivo index.js por defecto y si no lo encuentra
+sale error en la aplicación.
+
+
+********
+
+Haciendo un segundo router
+Se creó /heroes/routes/HeroesRoutes.jsx
+Se agregaron los Routes correspondientes y se
+quitaron de AppRouter.jsx(se dejó comentado)
+
+Todo esto se realizó para que estando en /login
+no se muestre el <Navbar />
+
+********
+
+Navigate push / replace - Custom Hooks useNavigate
+(provisto en react-router-dom)
+
+Navbar.jsx:
+
+Se usó useNavigate() para direccionar a /login:
+
+const navigate = useNavigate();
+
+const onLogout = () => {
+    navigate("/login");
+}
+
+pero si doy click en la flecha "atras" regresa a la
+página donde estaba para solucionar eso se envía replace:
+
+const onLogout = () => {
+    navigate('/login', {
+    replace: true
+    });
+}
+
+El replace sirve para limpiar las rutas navegadas para que el usuario
+no pueda regresar a la página anterior(de logout a la anterior)
+No me funcionó!
+
+********
+
+Lista de heroes
+Se usó un gist: https://gist.github.com/Klerith/934da045caae0fec3a1067d013926c46
+
+Se creó heroes/helpers/getHeroesByPublisher.js
+Para obtener heroes por publisher
+
+Se creó heroes/components/HeroesList.jsx
+
+********
+
+HeroCard.jsx
+
+por alguna razón cuando hago esto:
+{
+    heroes.map(hero => {
+        return <HeroCard
+        key={ hero.id }
+        {...hero}
+        />
+    })
+}
+
+si o si necesita el return para regresar el contenido, en los videos no es así
+
+retorno de propiedades | varias props | varias propiedades se realiza con
+el operador spread :    ...hero
+ya que son varias propiedades las que recibe el componente, no hace
+falta especificar cada una.
+
+
+<img src={ `/src/assets/heroes/${ id }.jpg` } className="card-img" alt="{ superhero }" /> :
+
+-Tuve que realizar la importacion con esa url, no me funcionó con la del video
+-Aquí se usa alt como texto alternativo si la imagen no existe
+
+
+Para mostrar solo si characters es diferente al alter_ego:
+
+{
+    ( alter_ego !== characters ) && <p>{ characters }</p>
+}
+
+Hay otras formas, como crear una constante para el <p>:
+
+const charactersByHero = (<p>{ characters }</p>);
+Luego:
+{
+    alter_ego!==characters && charactersByHero
+}
+
+
+Otra forma es hacer un componente "privado":
+
+const CharactersByHero = ({ characters, alter_ego }) => {
+    if ( alter_ego == characters ) return (<></>);
+    return ( <p>{ characters }</p> )
+}
+
+<CharactersByHero characters={ characters } alter_ego={ alter_ego} />
+
+Si se quiere reducir aún más el código se puede usar ternario:
+
+ ( alter_ego == characters )
+    ? (<></>)
+    : ( <p>{ characters }</p> )
+
+********
+
+Hacer paginas para los id's de los heroes
+
+En HeroesRoutes.jsx:
+
+<Route path="hero/:heroId" element={<HeroPage />} />
+
+Se pone el comodin :heroId
+
+HeroPage.jsx :
+
+customHooks :: useParams() 
+
+Viene de react-router-dom Sirve para obtener los parámetros de
+la url o path
+
+const params = useParams();
+console.log(params);
+
+{
+    "*": "hero/batman",
+    "heroId": "batman"
+}
+
+Se ve la prop heroId porque es la que se definió en el comodin del Route
+
+Ahora al darle a mas info del heroe nos lleva al HeroPage y muestra en consola la info
+del heroe. Si se cambia el valor de la url por algo inválido se muestra "undefined"
+
+
+Para enviar a otra pagina si la url no existe se hizo esto momentaneamente:
+
+if ( !hero ) {
+    return <Navigate to="/marvel" />
+}
+
+Se usó:
+navigate(-1);
+Para regresar a la página anterior.
+
+********
+
+Se agregó useMemo:
+
+HeroPage.jsx:
+const hero = useMemo( () => getHeroById( heroId ), [ heroId] );
+
+HeroesList.jsx:
+const heroes = useMemo( () => getHeroesByPublisher(publisher), [ publisher ]);
+
+Este hook recibe un callback y un arrego de dependencias.
+Nos ayuda a que si no cambia la dependencia no vuelve a ejecutar el proceso pesado.
+
+********
+
+Agregando animaciones | animacion | animación
+
+https://animate.style/
+
+Se agregó en index.html:
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+En HeroCard.jsx y HeroPage.jsx 
+se agregaron las clases de css
+
+********
+
+En SearchPage.jsx
+
+Se usó el useForm con navigate para enviar a una página
+con queryParam:
+
+navigate(`?q=${ searchText }`);
+
+El location obtenido con useLocation() de react-router-dom contiene esto:
+Es dificil de leer el search
+{
+    "pathname": "/search",
+    "search": "?q=batman&asc=true",
+    "hash": "",
+    "state": null,
+    "key": "niieiuta"
+}
+
+Por eso Agregar(es opcional solo se usa para parsear los queryParams):
+
+yarn add query-string
+
+const query = queryString.parse( location.search );
+
+{
+    "asc": "123",
+    "q": "batman"
+}
+
 ********
 
 
+********
+
 
 ********
+
+
+********
+
+
+********
+
+
+********
+
+
+********
+
+
+********
+
 
 ********
 
