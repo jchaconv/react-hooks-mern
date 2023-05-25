@@ -819,8 +819,19 @@ Se usó useState para modificar la info del usuario y que pueda tenerlo otro com
 SECCION 14 : HeroesApp - Single Page Application
 *************************************************
 
-navegar | navegacion | navegación | rutas | ruteo
+Temas:
 
+-SPA ( Single Page Application ) a profundidad
+-Diferentes temas en la misma aplicación aplicados a diferentes rutas
+-Multiples Routers
+-Push y Replace en el History
+-Leer argumentos por URL
+-QueryParams
+-Aplicar filtros utilizando QueryStrings
+
+********
+
+navegar | navegacion | navegación | rutas | ruteo
 
 D:\cursos-udemy\react-hooks-mern> yarn create vite
 name: heroes-app-spa
@@ -1050,6 +1061,8 @@ se agregaron las clases de css
 
 En SearchPage.jsx
 
+https://github.com/Klerith/custom-hooks
+
 Se usó el useForm con navigate para enviar a una página
 con queryParam:
 
@@ -1076,28 +1089,138 @@ const query = queryString.parse( location.search );
     "q": "batman"
 }
 
-********
 
+*********************************
+SECCION 15 : Protección de Rutas
+*********************************
 
-********
-
-
-********
-
-
-********
-
-
-********
-
+Temas:
+-Rutas públicas
+-Rutas privadas
+-Login y logout - Sin backend aún
+-Recordar cuál fue la última ruta visitada para mejorar la experiencia de usuario.
+-Context
+-Reducer
 
 ********
 
+Se creó la carpeta /auth/context/ y sus respectivos componentes
+
+Se añadió el AuthProvider en HeroesApp.jsx
+ya que es un punto alto de la aplicación y tengo 
+toda la información del context a lo largo de la aplicación
+
+********
+
+Login de usuario
+
+Navbar.jsx:
+
+Para mostrar el nombre del usuario logueado:
+const { user } = useContext(AuthContext);
+console.log(user);
+
+{
+    "id": "ABC",
+    "name": "Julio Chacon"
+}
+
+Mostrar así con el ? :
+{ user?.name }
+
+********
+
+Logout del usuario
+
+AuthProvider.jsx
+
+Se elimina la llave guardada en localStorage
+
+const logout = () => {
+    localStorage.removeItem('user');
+    dispatch({
+        type: types.logout
+    });
+}
+
+Navbar.jsx
+Se ejecuta el logout() expuesto desde el Context
+
+const onLogout = () => {
+    logout();
+    navigate('/login', {
+        replace: true
+    });        
+}
+
+********
+
+Rutas privadas
+
+Se creó /router/PrivateRoute.jsx
+
+Este componente valida si el usuario está logueado y retorna 
+los componentes en children, de lo contrario envia a /login
+
+
+En AppRouter se hizo este cambio:
+
+<Route path="/*" element={
+    <PrivateRoute>
+        <HeroesRoutes />
+    </PrivateRoute>
+    }
+/>
+
+Este cambio consiste en poner el HeroesRoutes dentro del PrivateRoute
+para ser evaluado. La prueba salió correcta.
+
+La idea es que si el usuario no está logueado no debería acceder a otros paths.
+
+********
+
+Rutas públicas
+
+Si el usuario está logueado y se escribe login en el path, se direcciona a marvel
+
+AppRouter.jsx:
+
+<Route path="/login" element={
+    <PublicRoute>
+      <LoginPage />
+    </PublicRoute>
+  }
+/>
+
+********
+
+Recordar la última página visitada
+
+PrivateRoute.jsx
+
+const { pathname, search } = useLocation();
+    
+const lastPath = pathname + search;
+localStorage.setItem('lastPath', lastPath);
+
+
+LoginPage.jsx
+
+Se valida si existe un lastPath sino retorna un / :
+
+const lastPath = localStorage.getItem('lastPath') || '/';
+
+Y en la función se envió a llamar:
+navigate( lastPath, {
+  replace: true
+});
+
+
+Con esto ya está recordando la última página.
 
 ********
 
 
-********
 
 
 ********
