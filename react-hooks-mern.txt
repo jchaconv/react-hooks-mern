@@ -1218,10 +1218,295 @@ navigate( lastPath, {
 
 Con esto ya está recordando la última página.
 
+***********************************************************
+SECCION 17 : JournalApp - MaterialUI - Estructura y diseño
+***********************************************************
+
+Temas:
+
+-Material UI
+-Diferentes componentes de material
+-Uso de funciones propias de MaterialUI
+-Configuración de temas personalizados
+
+********
+
+yarn create vite
+name: journal-app
+rename: 08-journal-app
+instalar dependencias con: yarn o yarn install
+
+ejecutar el proyecto: yarn dev
+
+-src
+  -auth
+  -journal
+  -router
+  -theme
+
+Ejecutar: yarn add react-router-dom@6
+
+En el main.jsx agregar el BrowserRouter:
+
+<BrowserRouter>
+    <JournalApp />
+</BrowserRouter>
+
+Comenzar con la definición de rutas:
+
+/auth/routes/AuthRoutes.jsx
+/journal/routes/JournalRoutes.jsx
+
+En ambos archivos direcciono a componentes
+Cuando defino el path /* es para rutas invalidas, usar con
+Navigate para enviar a otra ruta
+
+/router/AppRouter.jsx => El nivel más alto de rutas
+Aquí defino que cualquier ruta que empiece con /auth o /journal
+vaya por el route que corresponde
+
+********
+
+Instalar material ui
+
+mui.com => get started => installation
+
+Ejecutar para paquetes por default:
+yarn add @mui/material @emotion/react @emotion/styled
+
+Pegar en index.html la fuente de Roboto:
+
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+/>
+
+
+Ejecutar para tener iconos:
+yarn add @mui/icons-material
+
+********
+
+Configuración de MUI con Vite
+
+Se creó:
+/theme/AppTheme.jsx => Se definió el higher order component que necesita MUI
+/theme/purple.js => Se definió el objeto que actuará como tema
+
+Agregar lo siguiente en JournalApp, no en el main para que no sea muy complejo:
+
+return (
+    <AppTheme>
+        <AppRouter />
+    </AppTheme>
+)
+
+
+JournalPage.jsx :
+
+Es mejor importar especificamente el ícono para que demore menos en renderizar
+y el Typography es para poder manipular ese objeto con propiedades de material ui
+Poner sin llaves la import del icono.
+
+import  MailOutline  from '@mui/icons-material/MailOutline'
+import { Typography } from '@mui/material'
+import React from 'react'
+
+export const JournalPage = () => {
+    return (
+        <>
+            <Typography>JournalPage</Typography>
+            <MailOutline />
+
+        </>
+    )
+}
+
+********
+
+Diseño del Login :: LoginPage.jsx
+
+Se usan componente de ui como
+Button, Grid, TextField
+
+propiedades: 
+xs(extra small): es para pantallas pequeñas
+sm
+md
+xl
+sx: pantallas grandes
+
+fullwidth es para que tome todo el tamaño del padre
+
+Se usó Link de material ui y de react-router-dom
+
+********
+
+Layout
+
+Se usa porque los componentes son parecidos
+
+AuthLayout.jsx
+JournalLayout.jsx
+    - Box es como un div
+    - Drawer
+
+Se aplicaron muchos componentes de material ui
+explorar journal-app
+
+
+*******************
+SECCION 18 : REDUX
+*******************
+
+Temas:
+
+- Redux
+- Store
+- Middlewares
+- Dispatch
+- Actions
+- State
+- Acciones asíncronas
+- RTK Query
+- Redux Toolkit
+- Slices
+
+********
+
+Redux: Es como un context global del app. Sirve para react, angular, vue, etc
+
+Partes de Redux:
+
+Store: Envía state al View
+View: Dispara un action
+Dispatcher: Recibe el action y lo envía al Reducer
+    - Si el action es async entra en acción el Middleware (ej: peticion api)
+Reducer: Contiene todos los reducers, ejecuta la acción y retorna nuevo state
+
+********
+
+Redux, React Redux y RTK Query
+
+Redux: es el patrón en el que se basa la creación de states mediante reducers
+React Redux: React y Redux integración de ambos
+Redux Toolkit: Hacer simple la integración
+RTK Query: Para peticiones http
+
+
+https://redux-toolkit.js.org/
+
+Añadir extensión Redux DevTools a Chrome
+
+Config inicial del proyecto:
+
+yarn create vite
+name: toolkit-redux
+ejecutar yarn en el proyecto para instalar dependencias
+
+yarn add @reduxjs/toolkit react-redux
+
+********
+
+Configurar store y slices
+
+Se creó store/store.js
+
+Para que el store se aplique a todo el app necesitamos ponerlo en el main.jsx
+
+<Provider store={store}>
+    <App />
+ </Provider>
+
+Slice: Una función que recibe un objeto :: /slices/counter/counterSlice.js
+Aquí se definen las acciones o reducers que luego son importadas
+
+No es necesario hacer ...state porque createSlice de toolkit ya lo hace por default
+
+Para usar nuestro reducer modificamos el App.jsx y quitamos useState
+
+Está fácil, se usa:
+useSelector => para obtener el state que se definió en counterSlice.js
+useDispatch => para llamar la acción 
+
+En redux DevTools se ven los cambios del state de manera gráfica
+
+Se hizo increment, decrement, incrementByAmount
+
+********
+
+Snippet y Gists de Slice
+
+https://gist.github.com/Klerith/060281f76f3b7f0a458e4b83b1fc0062
+
+import { createSlice } from '@reduxjs/toolkit';
+
+export const templateSlice = createSlice({
+    name: 'name',
+    initialState: {
+        counter: 10
+    },
+    reducers: {
+        increment: (state, /* action */ ) => {
+            //! https://react-redux.js.org/tutorials/quick-start
+            // Redux Toolkit allows us to write "mutating" logic in reducers. It
+            // doesn't actually mutate the state because it uses the Immer library,
+            // which detects changes to a "draft state" and produces a brand new
+            // immutable state based off those changes
+            state.counter += 1;
+        },
+    }
+});
+
+
+// Action creators are generated for each case reducer function
+export const { increment } = templateSlice.actions;
+
+********
+
+pokemonSlice
+
+API para peticiones => pokeapi.co
+
+PokemonApp.jsx
+pokemonSlice.js
+
+Agregar al store.js
+
+Ya con esto aparece en devtools toda la info de los reducers
+
+********
+
+Thunks
+
+Una accion async que dispara otra accion cuando se termina la async
+
+thunks.js
+La funcion se llama en el useEffect de PokemonApp.jsx
+
+********
+
+Axios
+
+yarn add axios
+
+Se creó src/api/pokemonApi.js
+Y en thunks.js se completó el llamado con get()
+
+********
+
+
 ********
 
 
 
+********
+
 
 ********
+
+
+
+********
+
 
